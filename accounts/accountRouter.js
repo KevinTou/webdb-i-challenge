@@ -42,10 +42,17 @@ router.post('/', validateAccount, (req, res) => {
         });
     })
     .catch(err => {
-      res.status(500).json({
-        message: 'Error occurred while adding a new account.',
-        err: err,
-      });
+      if (err.errno === 19) {
+        res.status(500).json({
+          message: 'There cannot be accounts with the same name.',
+          err: err,
+        });
+      } else {
+        res.status(500).json({
+          message: 'Error occurred while adding a new account.',
+          err: err,
+        });
+      }
     });
 });
 
@@ -77,9 +84,17 @@ router.put('/:id', validateAccountId, validateAccount, (req, res) => {
       //   });
     })
     .catch(err => {
-      res
-        .status(500)
-        .json({ message: 'Error occurred while updating account.', err: err });
+      if (err.errno === 19) {
+        res.status(500).json({
+          message: 'There cannot be accounts with the same name.',
+          err: err,
+        });
+      } else {
+        res.status(500).json({
+          message: 'Error occurred while adding a new account.',
+          err: err,
+        });
+      }
     });
 });
 
@@ -140,11 +155,13 @@ function validateAccountId(req, res, next) {
         req.account = account;
         next();
       } else {
-        res.status(404).json({ message: `User with the id ${id} not found.` });
+        return res
+          .status(404)
+          .json({ message: `User with the id ${id} not found.` });
       }
     })
     .catch(err => {
-      res.status(500).json({
+      return res.status(500).json({
         message: 'Error occurred while getting account by id.',
         err: err,
       });
