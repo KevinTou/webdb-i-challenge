@@ -8,7 +8,16 @@ router.get('/', (req, res) => {
   // Accounts.select('*').from('accounts') // same as line 9
   Accounts('accounts')
     .then(accounts => {
-      res.status(200).json(accounts);
+      if (accounts.length === 0) {
+        res
+          .status(200)
+          .json({
+            message: 'There are currently no accounts.',
+            accounts: accounts,
+          });
+      } else {
+        res.status(200).json(accounts);
+      }
     })
     .catch(err => {
       res.status(500).json({
